@@ -1,17 +1,18 @@
+FROM        golang:1.20.1-alpine3.17 AS BUILD_IMAGE
+RUN         apk add --update --no-cache -t build-deps curl gcc libc-dev libgcc
+WORKDIR     /go/src/github.com/adnanh/webhook
+COPY        webhook.version .
+RUN         curl -#L -o webhook.tar.gz https://api.github.com/repos/adnanh/webhook/tarball/$(cat webhook.version) && \
+            tar -xzf webhook.tar.gz --strip 1 &&  \
+            go get -d && \
+            go build -ldflags="-s -w" -o /usr/local/bin/webhook
+
+
 FROM ghcr.io/stuffanthings/qbit_manage:develop
 
-COPY requirements.txt /
+COPY        --from=BUILD_IMAGE /usr/local/bin/webhook /usr/local/bin/webhook
 
-# install packages
-RUN echo "**** install system packages ****" \
- && apk update \
- && apk upgrade \
- && apk add --no-cache tzdata gcc g++ libxml2-dev libxslt-dev zlib-dev bash curl wget jq grep sed coreutils findutils unzip p7zip ca-certificates tini\
- && pip3 install --no-cache-dir --upgrade --requirement /requirements.txt \
- && apk del gcc g++ libxml2-dev libxslt-dev zlib-dev \
- && rm -rf /requirements.txt /tmp/* /var/tmp/* /var/cache/apk/*
-
-
-COPY qbit-hook.py /app
-
-
+WORKDIR     /config
+EXPOSE      9000
+ENTRYPOINT  ["/sbin/tini", "--", "/usr/local/bin/webhook"]
+CMD         ["-verbose", "-hotreload", "-hooks=hooks.yml"]
