@@ -4,7 +4,7 @@ Based off official [qbit_manage](https://github.com/StuffAnThings/qbit_manage) d
 
 Based on the webhook pattern from [TheCatLady](https://github.com/TheCatLady/docker-webhook)
 
-An example `/config/hooks.yaml` file to would be 
+An example `/config/hooks.yml` file to would be 
 ```
 - id: qbitmanage
   execute-command: /app/qbit_manage.py
