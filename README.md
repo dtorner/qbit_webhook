@@ -4,15 +4,11 @@ Based off official [qbit_manage](https://github.com/StuffAnThings/qbit_manage) d
 
 Based on the webhook pattern from [TheCatLady](https://github.com/TheCatLady/docker-webhook)
 
-An example `/config/hook.json` file to would be 
+An example `/config/hooks.yaml` file to would be 
 ```
-[
-  {
-    "id": "qbitmanage",
-    "execute-command": "/app/qbit_manage.py",
-    "command-working-directory": "/app"
-  }
-]
+- id: qbitmanage
+  execute-command: /app/qbit_manage.py
+  command-working-directory: /app
 ```
 
 This can be used the same way the qbit_manage image is loaded in a compose. Just swap out the image and add a port section. You will want the commands setup for a "run" `QBT_RUN=true` and not schedule.
